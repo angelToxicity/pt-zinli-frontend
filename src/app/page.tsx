@@ -41,16 +41,22 @@ export default function Login() {
                 <Label htmlFor="password">Contraseña</Label>
               </div>
               <Input id="password" type="password" required />
-              <Link
-                href="/forgot-password"
-                className="ml-auto inline-block text-sm underline"
-              >
-                Olvidaste tu contraseña
-              </Link>
             </div>
             <Button type="submit" className="w-full">
               Login
             </Button>
+            <div className="mt-4 text-center text-sm">
+              ¿No tienes cuenta? &nbsp;
+              <Link href="#" className="underline">
+                Regístrate
+              </Link>
+              {/* <Link
+                href="/forgot-password"
+                className="ml-auto inline-block text-sm underline"
+              >
+                Olvidaste tu contraseña
+              </Link> */}
+            </div>
           </div>
         </div>
       </div>
