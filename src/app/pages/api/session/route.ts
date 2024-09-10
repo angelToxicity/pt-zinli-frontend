@@ -1,6 +1,6 @@
 import { cookies } from 'next/headers'
 
-export async function GET() {
+export function GET() {
     const cookieStore = cookies()
     cookieStore.delete('id')
 

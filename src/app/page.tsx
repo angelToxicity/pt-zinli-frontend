@@ -48,7 +48,8 @@ export default function Login() {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(data)
-    }).then(res => res.json())
+    })
+    .then(res => res.json())
     .then(r => {
       if (r.message) {
         setIsLoading(false)

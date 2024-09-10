@@ -43,12 +43,11 @@ export default function MenuLayout({ children }: { children: React.ReactNode }) 
       setIsLoading(false)
     } else {
       const data = JSON.parse(crypto.decryptData(localStorage.getItem("user")!))
-      
       setRole(data.role)
       setAvatar(data.avatar)
       setIsLoading(false)
     }
-  }, [state, avatar, role, isLoading])
+  }, [])
 
   const newRef = (event: MouseEvent<HTMLAnchorElement, globalThis.MouseEvent>, newState:string):void => {
     event.preventDefault()
@@ -71,7 +70,6 @@ export default function MenuLayout({ children }: { children: React.ReactNode }) 
     const r = await res.json()
     if (r == "ok") {
       localStorage.clear()
-      setState("")
       router.push("/")
     }
   }

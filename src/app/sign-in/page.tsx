@@ -47,7 +47,9 @@ export default function SignIn() {
     const subscription = form.watch((value, { name, type }) => {
       if (name == "avatar" && type =="change") {
         const file = (document.getElementById(name) as HTMLInputElement).files![0];
-        toFile(file)
+        if (file) {
+          toFile(file)
+        }
       }
     })
     return () => subscription.unsubscribe()

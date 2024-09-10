@@ -15,11 +15,12 @@ export interface UserInterface {
 }
 
 export type Post = {
+    _id?: string;
     image?: string;
     message: string;
     likes?: Array<User>;
     author: User;
     create_at: Date;
     location: string;
-    status: 'drafted' | 'deleted' | 'published' | 'rejected';
+    status: string;
 }
