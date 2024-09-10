@@ -43,7 +43,7 @@ export default function SettingsProfilePage() {
         user.role = data.role
         setData(user)
         setIsLoading(false)
-      }, [state, isLoading, user])
+      }, [])
 
     if (isLoading) {
         return <div style={{position: "absolute", top: "50%", right: "50%", opacity: "1"}}><Spinner></Spinner></div>;

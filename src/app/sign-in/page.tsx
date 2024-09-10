@@ -51,7 +51,7 @@ export default function SignIn() {
       }
     })
     return () => subscription.unsubscribe()
-  }, [form.watch])
+  }, [form])
 
   const signIn:SubmitHandler<signInType> = (values) => {
     values.avatar = blob?.toString()

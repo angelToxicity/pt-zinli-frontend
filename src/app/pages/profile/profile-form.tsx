@@ -4,7 +4,6 @@ import { useForm, SubmitHandler } from "react-hook-form"
 import {
     Form,
     FormControl,
-    FormDescription,
     FormField,
     FormItem,
     FormLabel,
@@ -27,7 +26,7 @@ export function ProfileForm({avatar, username, name, surname, role}: User) {
         defaultValues
     })
 
-    let onSubmit:SubmitHandler<User> = (data) => {
+    const onSubmit:SubmitHandler<User> = () => {
 
     }
 

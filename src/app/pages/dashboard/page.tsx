@@ -21,6 +21,9 @@ export default function Dashboard() {
             data = JSON.parse(crypto.decryptData(localStorage.getItem("user")!))
         }
 
+        if (isLoading) {
+            
+        }
         // let posts = data.role == 'admin' ? '/post/stats' : '/post/'+data._id
         // const fetchedData = async () => {
         //     const reqData = await fetch('/pages/api/data?posts='+posts,{
@@ -42,7 +45,7 @@ export default function Dashboard() {
         // fetchedData()
         setState(data)
         setIsLoading(false)
-      }, [state, isLoading])
+      }, [])
 
     // useEffect(() => {
     //     let posts = 
