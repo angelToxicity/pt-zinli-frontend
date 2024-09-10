@@ -2,12 +2,10 @@
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Search, CircleCheckBig, DollarSign, Trash2, XCircle } from "lucide-react"
-import { Spinner } from "../../components/spinner";
+import { Search, CircleCheckBig, Trash2, XCircle } from "lucide-react"
 import { useState, useEffect } from 'react';
 import { useSharedState } from "../../components/context";
 import { Crypto } from "../../services/crypto";
-import Swal from "sweetalert2";
 
 const crypto = new Crypto();
 
@@ -42,7 +40,7 @@ export default function Dashboard() {
         //     return reqData
         // }
         // fetchedData()
-        // setData(user)
+        setState(data)
         setIsLoading(false)
       }, [state, isLoading])
 

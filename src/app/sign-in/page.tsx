@@ -53,9 +53,9 @@ export default function SignIn() {
     return () => subscription.unsubscribe()
   }, [form.watch])
 
-  let signIn:SubmitHandler<signInType> = (values) => {
+  const signIn:SubmitHandler<signInType> = (values) => {
     values.avatar = blob?.toString()
-    let data = {data: crypto.encryptData(JSON.stringify(values))};
+    const data = {data: crypto.encryptData(JSON.stringify(values))};
     setIsLoading(true)
     fetch(api_url+'/register',{
       method: 'POST',
@@ -90,7 +90,7 @@ export default function SignIn() {
     })
   }
 
-  let toFile = (file:any) => {
+  const toFile = (file:Blob) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
     reader.onload = function () {

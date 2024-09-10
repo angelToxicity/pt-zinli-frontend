@@ -1,11 +1,6 @@
 "use client"
 
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useFieldArray, useForm, SubmitHandler } from "react-hook-form"
-import { z } from "zod"
-import { cn } from "@/lib/utils"
+import { useForm, SubmitHandler } from "react-hook-form"
 import {
     Form,
     FormControl,
@@ -16,24 +11,9 @@ import {
     FormMessage,
   } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { useSharedState } from "../../components/context";
-import { useState, useEffect } from 'react';
-import { User, UserInterface } from "@/lib/definitions";
-import { Crypto } from "@/app/services/crypto";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-
-const crypto = new Crypto();
+import { User } from "@/lib/definitions";
 
 export function ProfileForm({avatar, username, name, surname, role}: User) {
-    let res:any
-    const { state, setState } = useSharedState();
-    const [ data, setData ] = useState<User>(res);
     
     const defaultValues: Partial<User> = {
       username: username,

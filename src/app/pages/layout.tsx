@@ -2,13 +2,12 @@
 
 import clsx from 'clsx';
 import Link from "next/link"
-import Image from "next/image"
 import { MouseEvent, useState, useEffect } from 'react';
 import { useRouter, usePathname } from 'next/navigation'
 import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
-import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetHeader, SheetDescription, SheetClose } from "@/components/ui/sheet"
-import { Package2, Menu, CircleUser } from "lucide-react"
+import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetHeader, SheetDescription } from "@/components/ui/sheet"
+import { Package2, Menu } from "lucide-react"
 import { useSharedState } from "../components/context";
 import { Crypto } from "../services/crypto";
 import {
@@ -28,7 +27,7 @@ import { Spinner } from "../components/spinner";
 const crypto = new Crypto();
 
 export default function MenuLayout({ children }: { children: React.ReactNode }) {
-  let path_arr = usePathname().split("/")
+  const path_arr = usePathname().split("/")
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(true)
   const [myRef, setRef] = useState(path_arr[path_arr.length - 1]);
@@ -38,12 +37,12 @@ export default function MenuLayout({ children }: { children: React.ReactNode }) 
 
   useEffect(() => {
     if (state) {
-      let data = JSON.parse(crypto.decryptData(state))
+      const data = JSON.parse(crypto.decryptData(state))
       setRole(data.role)
       setAvatar(data.avatar)
       setIsLoading(false)
     } else {
-      let data = JSON.parse(crypto.decryptData(localStorage.getItem("user")!))
+      const data = JSON.parse(crypto.decryptData(localStorage.getItem("user")!))
       
       setRole(data.role)
       setAvatar(data.avatar)
@@ -51,25 +50,25 @@ export default function MenuLayout({ children }: { children: React.ReactNode }) 
     }
   }, [state, avatar, role, isLoading])
 
-  let newRef = (event: MouseEvent<HTMLAnchorElement, globalThis.MouseEvent>, newState:string):void => {
+  const newRef = (event: MouseEvent<HTMLAnchorElement, globalThis.MouseEvent>, newState:string):void => {
     event.preventDefault()
     setRef(newState)
     router.push("/pages/"+newState)
   }
   
-  let profile = ():void => {
+  const profile = ():void => {
     router.push("/pages/profile")
   }
   
-  let closeSession = async () => {
-    let res = await fetch('/pages/api/session',{
+  const closeSession = async () => {
+    const res = await fetch('/pages/api/session',{
       method: 'GET',
       headers: {
         'Content-Type': 'application/json'
       }
     })
 
-    let r = await res.json()
+    const r = await res.json()
     if (r == "ok") {
       localStorage.clear()
       setState("")

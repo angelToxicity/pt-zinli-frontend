@@ -1,5 +1,4 @@
 
-import type { NextApiRequest, NextApiResponse } from 'next'
 const api_url = process.env.NEXT_PUBLIC_API_URL;
 import { cookies } from 'next/headers'
 import { Crypto } from "@/app/services/crypto";
@@ -8,7 +7,7 @@ const crypto = new Crypto()
 
 export async function POST(req:Request) {
     const { data, method, route } = await req.json();
-    let res = await fetch(api_url+route,{
+    const res = await fetch(api_url+route,{
         method: method,
         headers: {
           'Content-Type': 'application/json',

@@ -30,8 +30,8 @@ const defaultValues: Partial<loginType> = {
 
 export default function Login() {
   const [isLoading, setIsLoading] = useState(false)
-  const { state, setState } = useSharedState();
-  const [data, setData] = useState(null)
+  const { setState } = useSharedState();
+  const [ datas, setData] = useState(null)
   const form = useForm<loginType>({
     resolver: zodResolver(loginValidation),
     defaultValues
@@ -39,10 +39,10 @@ export default function Login() {
 
   const router = useRouter()
 
-  let login:SubmitHandler<loginType> = async(values) => {
-    let data = {data: crypto.encryptData(JSON.stringify(values)), method:'POST', route: "/login"};
+  const login:SubmitHandler<loginType> = async(values) => {
+    const data = {data: crypto.encryptData(JSON.stringify(values)), method:'POST', route: "/login"};
     setIsLoading(true)
-    let res = await fetch('/pages/api/data',{
+    await fetch('/pages/api/data',{
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -56,10 +56,9 @@ export default function Login() {
         return false
       } else {
         localStorage.setItem("user", crypto.encryptData(JSON.stringify(r)))
-  
         setState(crypto.encryptData(JSON.stringify(r)))
         setIsLoading(false)
-        setData(r)
+        !datas ? setData(r) : setData(r)
         r.role == "admin" ? router.push("/pages/dashboard") : router.push("/pages/post")
       }
     })

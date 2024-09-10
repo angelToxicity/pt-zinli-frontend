@@ -17,14 +17,14 @@ import {
 const crypto = new Crypto();
 
 export default function SettingsProfilePage() {
-    let user:User = {
+    const user:User = {
         avatar: "",
         username: "",
         name: "",
         surname: "",
         role: ""
     }
-    const { state, setState } = useSharedState();
+    const { state } = useSharedState();
     const [ data, setData ] = useState(user);
     const [isLoading, setIsLoading] = useState(true)
 
@@ -43,7 +43,7 @@ export default function SettingsProfilePage() {
         user.role = data.role
         setData(user)
         setIsLoading(false)
-      }, [state, isLoading])
+      }, [state, isLoading, user])
 
     if (isLoading) {
         return <div style={{position: "absolute", top: "50%", right: "50%", opacity: "1"}}><Spinner></Spinner></div>;

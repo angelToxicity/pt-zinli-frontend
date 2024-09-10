@@ -1,8 +1,6 @@
-import type { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 
-
-export async function GET(req:NextRequest, res:Response) {
+export async function GET() {
     const cookieStore = cookies()
     cookieStore.delete('id')
 
