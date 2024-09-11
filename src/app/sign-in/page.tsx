@@ -32,7 +32,6 @@ const defaultValues: Partial<signInType> = {
 }
 
 const crypto = new Crypto();
-const api_url = process.env.NEXT_PUBLIC_API_URL;
 
 export default function SignIn() {
   const router = useRouter()
@@ -55,16 +54,16 @@ export default function SignIn() {
     return () => subscription.unsubscribe()
   }, [form])
 
-  const signIn:SubmitHandler<signInType> = (values) => {
+  const signIn:SubmitHandler<signInType> = async(values) => {
     values.avatar = blob?.toString()
-    const data = {data: crypto.encryptData(JSON.stringify(values))};
     setIsLoading(true)
-    fetch(api_url+'/register',{
+    const body = {data: crypto.encryptData(JSON.stringify(values)), method: "POST", route: "/register"}
+    await fetch('/pages/api/data',{
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify(body)
     })
     .then((res) => res.json())
     .then((r) => {
@@ -87,6 +86,9 @@ export default function SignIn() {
         }
       });
       
+    }).catch(() => {
+      setIsLoading(false)
+      Swal.fire("Error", "Error registrando usuario", "error")
     })
   }
 

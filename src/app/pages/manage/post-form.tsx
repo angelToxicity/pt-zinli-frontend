@@ -26,26 +26,31 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Crypto } from "@/app/services/crypto"
 
-
-
 type Props = {
     title:string
     title_button:string,
-    openModal: (data:string|Post) => void
-}
-
-const defaultValues: Partial<postType> = {
-    image:"",
-    location:"",
-    message:""
+    openModal: (data:string|Post) => void,
+    img: (d:string) => void,
+    element: Post
 }
 
 const crypto = new Crypto()
 
-export function PostForm({title, title_button, openModal}:Props) {
+export function PostForm({title, title_button, openModal, element}:Props) {
     const { state, setState } = useSharedState();
     const [blob, setBlob] = useState<string|null>()
     const [isLoading, setIsLoading] = useState(false)
+
+    const defaultValues: Partial<postType> = {
+        image:element.image,
+        location:element.location,
+        message:element.message
+    }
+
+    const form = useForm<postType>({
+        resolver: zodResolver(postValidation),
+        defaultValues
+    })
 
     useEffect(() => {
         if (!state) {
@@ -63,10 +68,7 @@ export function PostForm({title, title_button, openModal}:Props) {
         return () => subscription.unsubscribe()
     })
 
-    const form = useForm<postType>({
-        resolver: zodResolver(postValidation),
-        defaultValues
-    })
+    
     
     const onSubmit:SubmitHandler<postType> = (values) => {
         values.image = blob?.toString()
@@ -78,20 +80,21 @@ export function PostForm({title, title_button, openModal}:Props) {
         fetch("/pages/api/data",{
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*',
-            'Access-Control-Allow-Methods': 'POST',
-            'Access-Control-Allow-Headers': 'Content-Type'
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify(data)
         })
         .then((res) => res.json())
         .then((r) => {
-          if (r.data.message_err) {
-            openModal(r.data.message_err)
-        } else {
-            openModal(r.data)
-          }
+            if (r.data.message_err) {
+                openModal(r.data.message_err)
+            } else if (r.data.statusCode == 413) {
+                openModal("Imagen muy pesada. Intente cargar una imagen con peso no mayor a 50kb")
+            } else {
+                openModal(r.data)
+            }
+        }).catch(() => {
+            openModal("Error registrando información del post")
         })
     }
     
@@ -120,7 +123,7 @@ export function PostForm({title, title_button, openModal}:Props) {
                             <FormField 
                             control={form.control}
                             name="image"
-                            render={({ field }) => (
+                            render={() => (
                                 <FormItem>
                                 <FormLabel>Imagen</FormLabel>
                                 <FormControl>
@@ -128,7 +131,7 @@ export function PostForm({title, title_button, openModal}:Props) {
                                     id="image"
                                     type="file"
                                     accept="image/png image/jpeg, image/jpg"
-                                    {...field}
+                                    // {...field}
                                     />
                                 </FormControl>
                                 <FormDescription>*formatos aceptados (png, jpeg, jpg)</FormDescription>

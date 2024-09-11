@@ -61,10 +61,7 @@ export default function MenuLayout({ children }: { children: React.ReactNode }) 
   
   const closeSession = async () => {
     const res = await fetch('/pages/api/session',{
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json'
-      }
+      method: 'GET'
     })
 
     const r = await res.json()

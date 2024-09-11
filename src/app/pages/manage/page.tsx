@@ -1,14 +1,14 @@
 "use client"
 
 import Swal from "sweetalert2";
+import { Post } from "@/lib/definitions"
 import { useState, useEffect } from 'react';
 import { MoreHorizontal } from "lucide-react"
-import { Badge } from "@/components/ui/badge"
+import { Badge } from "@/components/ui/badge";
 import { Crypto } from "../../services/crypto";
 import { Button } from "@/components/ui/button"
 import { Spinner } from "@/app/components/spinner";
 import { PostForm } from "@/app/pages/manage/post-form"
-import { Post } from "@/lib/definitions"
 import { useSharedState } from "../../components/context";
 import {
   Card,
@@ -62,42 +62,82 @@ const crypto = new Crypto();
 export default function Component() {
     const [ isLoading, setIsLoading ] = useState(true)
     const [ list, setList ] = useState<Post[]>([])
+    const [ title, setTitle ] = useState("")
+    const [ title_button, setTitleButton ] = useState("")
     const [ open, setOpen ] = useState(false);
     const [ role, setRole ] = useState("");
+    const [ element, setElement ] = useState({} as Post);
     const { state } = useSharedState();
+    const [img, setImg] = useState("")
 
     const openModalSub = (estado:boolean = true) => {
+        if (estado) {
+            setTitle("Agregar")
+            setTitleButton("Guardar")
+        } else {
+            setTitle("Actualizar")
+            setTitleButton("Editar")
+        }
         setOpen(estado)
     }
 
     const changeStatus = async (status:string, id:string) => {
         setIsLoading(true)
-        const body = JSON.stringify({data: {status: status, _id: id},  route: "/post/status", method: "POST"})
+        const data = {data: crypto.encryptData(JSON.stringify({status: status, _id: id})), method:'PATCH', route: "/post/status"};
         await fetch('/pages/api/data', {
-            method: 'POST',
-            body: JSON.stringify({data: crypto.encryptData(body)})
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
         })
         .then((res) => res.json())
         .then(r => {
-            setIsLoading(false)
-            if (r.data.message_err) {
-                Swal.fire("Error", r.data.message_err, "error");
+            if (r.message_err) {
+                Swal.fire("Error", r.message_err, "error");
                 return false
             } else {
                 const newList = list.map(e => {
-                    if (e._id == id) {
-                        e.status = status
+                    if (status == "rejected" && e._id != id) {
+                        return e
+                    } else {
+                        if (e._id == id) {
+                            e.status = status
+    
+                            switch (status) {
+                                case "published":
+                                    e.color = "bg-lime-500"
+                                    e.description = "Publicado"
+                                    break;
+                                case "drafted":
+                                    e.color = "bg-yellow-300"
+                                    e.description = "Pendiente"
+                                    break;
+                                case "deleted":
+                                    e.color = "bg-red-500"
+                                    e.description = "Eliminado"
+                                    break;
+                                case "rejected":
+                                    e.color = "bg-orange-400"
+                                    e.description = "Rechazado"
+                                    break;
+                            
+                                default:
+                                    break;
+                            }
+                        }
+    
+                        return e
                     }
-                    return e
                 })
                 setList(newList)
+                setIsLoading(false)
             }
         })
     }
     
     const openModal = (data:string|Post) => {
         setOpen(false)
-
         if (typeof data === 'string') {
             Swal.fire("Error", data, "error");
         } else {
@@ -110,14 +150,29 @@ export default function Component() {
             }).then((result) => {
                 if (result.isConfirmed) {
                     const newList = [...list]
+                    data.description = "Pendiente"
+                    data.color = "bg-yellow-300"
+                    data.author = JSON.parse(crypto.decryptData(localStorage.getItem("user")!))
+                    data.create_at = new Date()
+                    data.likes = []
+                    data.image = img
                     newList.push(data)
                     setList(newList)
                 }
             });
         }
     }
+    
+    const edit = (e:Post) => {
+        setTitle("Editar")
+        setTitleButton("Editar")
+        setElement(e)
+        setOpen(true)
+    }
 
     useEffect(() => {
+        setTitle("Agregar")
+        setTitleButton("Guardar")
         let data = null
         if (state) {
             data = JSON.parse(crypto.decryptData(state))
@@ -126,10 +181,10 @@ export default function Component() {
         }
 
         setRole(data.role)
-
+        setIsLoading(true)
         const posts = data.role == 'admin' ? '/post/list/all' : '/post/list/'+data._id
         const fetchedData = async () => {
-            const reqData = await fetch('/pages/api/data?posts='+posts,{
+            await fetch('/pages/api/data?posts='+posts,{
                 method: 'GET'
                 }).then(res => res.json())
             .then(r => {
@@ -157,14 +212,17 @@ export default function Component() {
                         }
                         return e
                     })
-                    
                     setList(res_color)
                 }
+            }).catch((err) => {
+                if (err.status == 413) {
+                    Swal.fire("Advertencia", "Imagen muy pesada. Actualice a una con peso no mayo a 50kb", "warning")
+                }
+                Swal.fire("Error", "Error insertando post", "error")
             })
-            return reqData
         }
         fetchedData().then(() => setIsLoading(false))
-      }, [open, isLoading])
+      }, [])
     
     if (isLoading) {
         return <div style={{position: "absolute", top: "50%", right: "50%", opacity: "1"}}><Spinner></Spinner></div>;
@@ -188,7 +246,7 @@ export default function Component() {
                                     <Button>Agrega un Post</Button>
                                 </div>
                             </DialogTrigger>
-                            <PostForm title="Agregar" title_button="Guardar" openModal={openModal}></PostForm>
+                            <PostForm title={title} title_button={title_button} openModal={openModal} element={element} img={() => setImg(img)}></PostForm>
                         </Dialog>
                         
                     </div>
@@ -253,9 +311,9 @@ export default function Component() {
                                         <DropdownMenuContent align="end">
                                             <DropdownMenuLabel>Acciones</DropdownMenuLabel>
                                             {role == "admin" && <DropdownMenuItem onClick={() => changeStatus("published", l._id!)}>Publicar</DropdownMenuItem>}
-                                            {role == "admin" && <DropdownMenuItem onClick={() =>  changeStatus("rejected", l._id!)}>Rechazar</DropdownMenuItem>}
-                                            <DropdownMenuItem>Editar</DropdownMenuItem>
-                                            <DropdownMenuItem onClick={() =>  changeStatus("deleted", l._id!)}>Eliminar</DropdownMenuItem>
+                                            {role == "admin" && <DropdownMenuItem onClick={() => changeStatus("rejected", l._id!)}>Rechazar</DropdownMenuItem>}
+                                            <DropdownMenuItem onClick={() => edit(l)}>Editar</DropdownMenuItem>
+                                            <DropdownMenuItem onClick={() => changeStatus("deleted", l._id!)}>Eliminar</DropdownMenuItem>
                                         </DropdownMenuContent>
                                         </DropdownMenu>
                                     </TableCell>

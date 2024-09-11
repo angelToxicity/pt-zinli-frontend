@@ -6,12 +6,15 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
+  CardFooter
 } from "@/components/ui/card"
+import { Separator } from "@/components/ui/separator"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useState, useEffect } from 'react';
 import Swal from "sweetalert2";
 import { Post } from "@/lib/definitions"
 import Image from "next/image"
+import { Badge } from "@/components/ui/badge";
 
 import {
   ContextMenu,
@@ -75,6 +78,11 @@ export default function Component() {
                     <Skeleton className="h-4 w-[250px]" />
                     <Skeleton className="h-4 w-[200px]" />
                 </div>
+                <Skeleton className="h-[125px] w-[250px] rounded-xl" />
+                <div className="space-y-2">
+                    <Skeleton className="h-4 w-[250px]" />
+                    <Skeleton className="h-4 w-[200px]" />
+                </div>
             </div>
         </div>;
     }
@@ -82,11 +90,10 @@ export default function Component() {
     return (
         <div className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 items-center">
             {list.map((l) => (
-                <Card key={l._id} className="w-250">
+                <Card key={l._id} className="w-1/3">
                     <CardHeader>
-                        <CardTitle>{l.message}</CardTitle>
+                        <CardTitle></CardTitle>
                         <CardDescription>
-                        {l.author.username +" - "+(l.location ? l.location : "N/A")}
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -104,15 +111,20 @@ export default function Component() {
                             </ContextMenuTrigger>
                         </ContextMenu>
                     </CardContent>
+                    <Separator />
+                    <CardFooter className="justify-center">
+                        <div className="space-y-3 w-[250px] mt-5">
+                            <div className="space-y-1 text-sm">
+                                <div className="flex justify-between">
+                                    <h3 className="font-medium leading-none">{l.message}</h3>
+                                    <Badge className={l.color +' txt-sm'} variant="outline">{l.description}</Badge>
+                                </div>
+                                <p className="text-xs text-muted-foreground">{l.author.username +" - "+(l.location ? l.location : "N/A")}</p>
+                            </div>
+                        </div>
+                    </CardFooter>
                 </Card>
             ))}
-            <div className="flex flex-col space-y-3">
-                <Skeleton className="h-[125px] w-[250px] rounded-xl" />
-                <div className="space-y-2">
-                    <Skeleton className="h-4 w-[250px]" />
-                    <Skeleton className="h-4 w-[200px]" />
-                </div>
-            </div>
         </div>
     )
 }

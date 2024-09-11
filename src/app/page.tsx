@@ -62,6 +62,9 @@ export default function Login() {
         !datas ? setData(r.data) : setData(r.data)
         r.data.role == "admin" ? router.push("/pages/dashboard") : router.push("/pages/post")
       }
+    }).catch((err) => {
+      setIsLoading(false)
+      Swal.fire("Error", err, "error")
     })
   }
 
