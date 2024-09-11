@@ -34,7 +34,8 @@ export async function POST(req:Request) {
 }
 
 export async function PATCH(req:Request) {
-    const { data, route, method } = JSON.parse(crypto.decryptData(await req.json()));
+    const body = await req.json()
+    const { data, route, method } = JSON.parse(crypto.decryptData(body));
     const res = await fetch(api_url+route,{
         method: method,
         headers: {
