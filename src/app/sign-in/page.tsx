@@ -63,9 +63,6 @@ export default function SignIn() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST',
-        'Access-Control-Allow-Headers': 'Content-Type'
       },
       body: JSON.stringify(data)
     })
@@ -76,7 +73,7 @@ export default function SignIn() {
         Swal.fire("Error", r.data.message, "error");
         return false
       }
-      
+
       Swal.fire({
         title: "Exito",
         text: "Usuario registrado correctamente. Ingrese con sus credenciales",
