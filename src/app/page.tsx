@@ -51,15 +51,15 @@ export default function Login() {
     })
     .then(res => res.json())
     .then(r => {
-      if (r.message) {
+      if (r.data.message) {
         setIsLoading(false)
-        Swal.fire("Error", r.message, "error");
+        Swal.fire("Error", r.data.message, "error");
         return false
       } else {
-        localStorage.setItem("user", crypto.encryptData(JSON.stringify(r)))
-        setState(crypto.encryptData(JSON.stringify(r)))
+        localStorage.setItem("user", crypto.encryptData(JSON.stringify(r.data)))
+        setState(crypto.encryptData(JSON.stringify(r.data)))
         setIsLoading(false)
-        !datas ? setData(r) : setData(r)
+        !datas ? setData(r.data) : setData(r.data)
         r.role == "admin" ? router.push("/pages/dashboard") : router.push("/pages/post")
       }
     })

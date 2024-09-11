@@ -71,11 +71,12 @@ export default function SignIn() {
     })
     .then((res) => res.json())
     .then((r) => {
-      if (r.message) {
+      if (r.data.message) {
         setIsLoading(false)
-        Swal.fire("Error", r.message, "error");
+        Swal.fire("Error", r.data.message, "error");
         return false
       }
+      
       Swal.fire({
         title: "Exito",
         text: "Usuario registrado correctamente. Ingrese con sus credenciales",

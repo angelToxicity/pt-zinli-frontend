@@ -39,12 +39,12 @@ export default function Dashboard() {
                 method: 'GET'
                 }).then(res => res.json())
                 .then(r => {
-                if (r.message) {
+                if (r.data.message) {
                     setIsLoading(false)
-                    Swal.fire("Error", r.message, "error");
+                    Swal.fire("Error", r.data.message, "error");
                     return false
                 } else {
-                    const res_color = r.map((e:Stats) => {
+                    const res_color = r.data.map((e:Stats) => {
                         switch (e.statusId) {
                             case "published":
                                 e.color = "bg-lime-500"

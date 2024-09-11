@@ -68,7 +68,7 @@ export default function MenuLayout({ children }: { children: React.ReactNode }) 
     })
 
     const r = await res.json()
-    if (r == "ok") {
+    if (r.data == "ok") {
       localStorage.clear()
       router.push("/")
     }

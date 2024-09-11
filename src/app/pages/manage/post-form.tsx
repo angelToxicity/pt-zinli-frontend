@@ -87,10 +87,10 @@ export function PostForm({title, title_button, openModal}:Props) {
         })
         .then((res) => res.json())
         .then((r) => {
-          if (r.message_err) {
-            openModal(r.message_err)
+          if (r.data.message_err) {
+            openModal(r.data.message_err)
         } else {
-            openModal(r)
+            openModal(r.data)
           }
         })
     }

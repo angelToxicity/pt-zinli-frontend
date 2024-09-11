@@ -29,11 +29,11 @@ export default function Component() {
                 method: 'GET'
                 }).then(res => res.json())
             .then(r => {
-                if (r.message_err) {
-                    Swal.fire("Error", r.message_err, "error");
+                if (r.data.message_err) {
+                    Swal.fire("Error", r.data.message_err, "error");
                     return false
                 } else {
-                    const res_color = r.map((e:Post) => {
+                    const res_color = r.data.map((e:Post) => {
                         switch (e.status) {
                             case "published":
                                 e.color = "bg-lime-500"

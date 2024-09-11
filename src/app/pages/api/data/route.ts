@@ -28,7 +28,7 @@ export async function POST(req:Request) {
         cookieStore.set('id', info_user._id, {secure: true})
     }
 
-    return Response.json(info_user, {
+    return Response.json({data: info_user}, {
         status: res.status
     })
 }
@@ -55,7 +55,7 @@ export async function PATCH(req:Request) {
         info_user = JSON.parse(crypto.decryptData(response.data))
     }
 
-    return Response.json(info_user, {
+    return Response.json({data: info_user}, {
         status: res.status
     })
 }
@@ -84,7 +84,7 @@ export async function GET(req:NextRequest) {
         cookieStore.set('id', info_user._id, {secure: true})
     }
 
-    return Response.json(info_user, {
+    return Response.json({data: info_user}, {
         status: res.status
     })
 }
