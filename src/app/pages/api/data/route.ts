@@ -35,16 +35,17 @@ export async function POST(req:Request) {
 
 export async function PATCH(req:Request) {
     const body = await req.json()
-    const { data, route, method } = JSON.parse(crypto.decryptData(body));
-    const res = await fetch(api_url+route,{
-        method: method,
+    const { data } = JSON.parse(crypto.decryptData(body));
+    
+    const res = await fetch(api_url+data.route,{
+        method: data.method,
         headers: {
           'Content-Type': 'application/json',
           'Access-Control-Allow-Origin': '*',
           'Access-Control-Allow-Methods': 'POST',
           'Access-Control-Allow-Headers': 'Content-Type',
         },
-        body: JSON.stringify({data: data})
+        body: JSON.stringify({data: data.data})
     })
     
     const response = await res.json()

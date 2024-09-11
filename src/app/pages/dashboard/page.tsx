@@ -1,5 +1,6 @@
 "use client"
 
+import Link from "next/link"
 import Swal from "sweetalert2";
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -103,7 +104,13 @@ export default function Dashboard() {
                         <p className="text-sm text-muted-foreground">
                             Empieza a publicar de inmediato!
                         </p>
-                        <Button className="mt-4">Agrega un Post</Button>
+                        <Button className="mt-4">
+                            <Link
+                                href="/pages/manage"
+                            >
+                                Agrega un Post
+                            </Link>
+                        </Button>
                     </div>
                 </div>
             </div>
