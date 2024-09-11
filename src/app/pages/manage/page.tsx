@@ -72,7 +72,7 @@ export default function Component() {
 
     const changeStatus = async (status:string, id:string) => {
         setIsLoading(true)
-        const body = JSON.stringify({data: {status: status, _id: id},  route: "/post/status", method: "PATCH"})
+        const body = JSON.stringify({data: {status: status, _id: id},  route: "/post/status", method: "POST"})
         await fetch('/pages/api/data', {
             method: 'POST',
             body: JSON.stringify({data: crypto.encryptData(body)})
