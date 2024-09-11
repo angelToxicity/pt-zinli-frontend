@@ -72,10 +72,10 @@ export default function Component() {
 
     const changeStatus = async (status:string, id:string) => {
         setIsLoading(true)
-        const body = JSON.stringify({data: {data: {status: status, _id: id},  route: "/post/status", method: "PATCH"} })
+        const body = JSON.stringify({data: {status: status, _id: id},  route: "/post/status", method: "PATCH"})
         await fetch('/pages/api/data', {
             method: 'PATCH',
-            body: JSON.stringify(crypto.encryptData(body))
+            body: JSON.stringify({data: crypto.encryptData(body)})
         })
         .then(res => res.json())
         .then(r => {
