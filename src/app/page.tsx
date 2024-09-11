@@ -60,7 +60,7 @@ export default function Login() {
         setState(crypto.encryptData(JSON.stringify(r.data)))
         setIsLoading(false)
         !datas ? setData(r.data) : setData(r.data)
-        r.role == "admin" ? router.push("/pages/dashboard") : router.push("/pages/post")
+        r.data.role == "admin" ? router.push("/pages/dashboard") : router.push("/pages/post")
       }
     })
   }
