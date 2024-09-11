@@ -109,7 +109,7 @@ export default function Component() {
                 allowOutsideClick:false
             }).then((result) => {
                 if (result.isConfirmed) {
-                    let newList = [...list]
+                    const newList = [...list]
                     newList.push(data)
                     setList(newList)
                 }

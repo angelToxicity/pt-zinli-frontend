@@ -7,21 +7,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useState, useEffect } from 'react';
 import { useSharedState } from "../../components/context";
 import { Crypto } from "../../services/crypto";
 import Swal from "sweetalert2";
 import { Post } from "@/lib/definitions"
-import { Spinner } from "@/app/components/spinner";
 import Image from "next/image"
 
 import {
   ContextMenu,
-  ContextMenuContent,
-  ContextMenuItem,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu"
 
@@ -30,17 +25,9 @@ const crypto = new Crypto();
 
 export default function Component() {
     const [ isLoading, setIsLoading ] = useState(true)
-    const { state } = useSharedState();
     const [ list, setList ] = useState<Post[]>([])
 
     useEffect(() => {
-        let data = null
-        if (state) {
-            data = JSON.parse(crypto.decryptData(state))
-        } else {
-            data = JSON.parse(crypto.decryptData(localStorage.getItem("user")!))
-        }
-
         const posts = '/post/list/all'
         const fetchedData = async () => {
             const reqData = await fetch('/pages/api/data?posts='+posts,{

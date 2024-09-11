@@ -48,11 +48,7 @@ export function PostForm({title, title_button, openModal}:Props) {
     const [isLoading, setIsLoading] = useState(false)
 
     useEffect(() => {
-        let data = null
-        if (state) {
-            data = JSON.parse(crypto.decryptData(state))
-        } else {
-            data = JSON.parse(crypto.decryptData(localStorage.getItem("user")!))
+        if (!state) {
             setState(localStorage.getItem("user")!)
         }
 
