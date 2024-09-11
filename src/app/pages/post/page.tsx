@@ -9,8 +9,6 @@ import {
 } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 import { useState, useEffect } from 'react';
-import { useSharedState } from "../../components/context";
-import { Crypto } from "../../services/crypto";
 import Swal from "sweetalert2";
 import { Post } from "@/lib/definitions"
 import Image from "next/image"
@@ -19,9 +17,6 @@ import {
   ContextMenu,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu"
-
-
-const crypto = new Crypto();
 
 export default function Component() {
     const [ isLoading, setIsLoading ] = useState(true)
