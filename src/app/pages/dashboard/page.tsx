@@ -22,7 +22,7 @@ type Stats = {
 export default function Dashboard() {
     const [ isLoading, setIsLoading ] = useState(true)
     const [ stats, setStats ] = useState<Stats[]>([])
-    const { state, setState } = useSharedState();
+    const { state } = useSharedState();
 
     useEffect(() => {
         let data = null

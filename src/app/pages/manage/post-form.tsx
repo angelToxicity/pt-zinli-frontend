@@ -1,4 +1,4 @@
-import Swal from "sweetalert2";
+import { Post } from "@/lib/definitions"
 import { useState, useEffect } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm, SubmitHandler } from "react-hook-form";
@@ -15,22 +15,23 @@ import {
   } from "@/components/ui/form"
 
 import {
-    Dialog,
     DialogContent,
     DialogDescription,
     DialogFooter,
     DialogHeader,
     DialogTitle,
-    DialogTrigger,
 } from "@/components/ui/dialog"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Crypto } from "@/app/services/crypto"
 
+
+
 type Props = {
     title:string
-    title_button:string
+    title_button:string,
+    openModal: (data:string|Post) => void
 }
 
 const defaultValues: Partial<postType> = {
@@ -41,7 +42,7 @@ const defaultValues: Partial<postType> = {
 
 const crypto = new Crypto()
 
-export function PostForm({title, title_button}:Props) {
+export function PostForm({title, title_button, openModal}:Props) {
     const { state, setState } = useSharedState();
     const [blob, setBlob] = useState<string|null>()
     const [isLoading, setIsLoading] = useState(false)
@@ -75,7 +76,7 @@ export function PostForm({title, title_button}:Props) {
         values.image = blob?.toString()
         values.author = state
         values.status = "drafted"
-        console.log(values)
+        
         const data = {data: crypto.encryptData(JSON.stringify(values)), "method": "POST", "route": "/post/create"};
         setIsLoading(true)
         fetch("/pages/api/data",{
@@ -90,24 +91,11 @@ export function PostForm({title, title_button}:Props) {
         })
         .then((res) => res.json())
         .then((r) => {
-          if (r.message) {
-            setIsLoading(false)
-            Swal.fire("Error", r.message, "error");
-            return false
+          if (r.message_err) {
+            openModal(r.message_err)
+        } else {
+            openModal(r)
           }
-        //   Swal.fire({
-        //     title: "Exito",
-        //     text: "Usuario registrado correctamente. Ingrese con sus credenciales",
-        //     icon: "success",
-        //     allowEscapeKey: false,
-        //     allowOutsideClick:false
-        //   }).then((result) => {
-        //     if (result.isConfirmed) {
-        //       setIsLoading(false)
-        //       router.push("/")
-        //     }
-        //   });
-          
         })
     }
     
@@ -119,16 +107,20 @@ export function PostForm({title, title_button}:Props) {
         };
     }
 
+    if (isLoading) {
+        
+    }
+
     return (
         <DialogContent className="sm:max-w-[425px] bg-white">
             <DialogHeader>
                 <DialogTitle>{title} post</DialogTitle>
             </DialogHeader>
             <DialogDescription></DialogDescription>
-            <div className="grid gap-4 py-4">
+            <div className="grid gap-4">
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} method="post">
-                        <div className="grid gap-2 mt-3">
+                        <div className="grid gap-2">
                             <FormField 
                             control={form.control}
                             name="image"

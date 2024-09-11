@@ -33,7 +33,7 @@ export default function MenuLayout({ children }: { children: React.ReactNode }) 
   const [myRef, setRef] = useState(path_arr[path_arr.length - 1]);
   const [role, setRole] = useState("");
   const [avatar, setAvatar] = useState("");
-  const { state, setState } = useSharedState();
+  const { state } = useSharedState();
 
   useEffect(() => {
     if (state) {
@@ -168,7 +168,7 @@ export default function MenuLayout({ children }: { children: React.ReactNode }) 
                     <Button variant="secondary" size="icon" className="rounded-full">
                     <Avatar>
                       <AvatarImage src={avatar} />
-                      <AvatarFallback>CN</AvatarFallback>
+                      <AvatarFallback>AR</AvatarFallback>
                     </Avatar>
                     </Button>
                   </DropdownMenuTrigger>

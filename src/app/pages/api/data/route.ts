@@ -33,6 +33,31 @@ export async function POST(req:Request) {
     })
 }
 
+export async function PATCH(req:Request) {
+    const { data, route, method } = JSON.parse(crypto.decryptData(await req.json()));
+    const res = await fetch(api_url+route,{
+        method: method,
+        headers: {
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Methods': 'POST',
+          'Access-Control-Allow-Headers': 'Content-Type',
+        },
+        body: JSON.stringify({data: data})
+    })
+    
+    const response = await res.json()
+    
+    let info_user = response.data ? response.data : response
+    if(response.data){
+        info_user = JSON.parse(crypto.decryptData(response.data))
+    }
+
+    return Response.json(info_user, {
+        status: res.status
+    })
+}
+
 export async function GET(req:NextRequest) {
     
     const url = new URL(req.url)

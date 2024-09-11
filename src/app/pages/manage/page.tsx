@@ -1,6 +1,5 @@
 "use client"
 
-import Image from "next/image"
 import Swal from "sweetalert2";
 import { useState, useEffect } from 'react';
 import { MoreHorizontal } from "lucide-react"
@@ -49,20 +48,74 @@ import {
 
 import {
     Dialog,
-    DialogContent,
-    DialogDescription,
-    DialogFooter,
-    DialogHeader,
-    DialogTitle,
     DialogTrigger,
-  } from "@/components/ui/dialog"
+} from "@/components/ui/dialog"
+
+import {
+    Avatar,
+    AvatarFallback,
+    AvatarImage,
+} from "@/components/ui/avatar"
 
 const crypto = new Crypto();
 
 export default function Component() {
     const [ isLoading, setIsLoading ] = useState(true)
     const [ list, setList ] = useState<Post[]>([])
-    const { state, setState } = useSharedState();
+    const [ open, setOpen ] = useState(false);
+    const [ role, setRole ] = useState("");
+    const { state } = useSharedState();
+
+    const openModalSub = (estado:boolean = true) => {
+        setOpen(estado)
+    }
+
+    const changeStatus = async (status:string, id:string) => {
+        setIsLoading(true)
+        const body = { data: {status: status, _id: id},  route: "/post/status", method: "PATCH" }
+        await fetch('/pages/api/data', {
+            method: 'PATCH',
+            body: JSON.stringify(crypto.encryptData(JSON.stringify(body)))
+        })
+        .then(res => res.json())
+        .then(r => {
+            setIsLoading(false)
+            if (r.message_err) {
+                Swal.fire("Error", r.message_err, "error");
+                return false
+            } else {
+                const newList = list.map(e => {
+                    if (e._id == id) {
+                        e.status = status
+                    }
+                    return e
+                })
+                setList(newList)
+            }
+        })
+    }
+    
+    const openModal = (data:string|Post) => {
+        setOpen(false)
+
+        if (typeof data === 'string') {
+            Swal.fire("Error", data, "error");
+        } else {
+            Swal.fire({
+                title: "Exito",
+                text: "Post registrado correctamente",
+                icon: "success",
+                allowEscapeKey: false,
+                allowOutsideClick:false
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    let newList = [...list]
+                    newList.push(data)
+                    setList(newList)
+                }
+            });
+        }
+    }
 
     useEffect(() => {
         let data = null
@@ -72,45 +125,46 @@ export default function Component() {
             data = JSON.parse(crypto.decryptData(localStorage.getItem("user")!))
         }
 
+        setRole(data.role)
+
         const posts = data.role == 'admin' ? '/post/list/all' : '/post/list/'+data._id
         const fetchedData = async () => {
             const reqData = await fetch('/pages/api/data?posts='+posts,{
                 method: 'GET'
                 }).then(res => res.json())
             .then(r => {
-                if (r.message) {
-                    Swal.fire("Error", r.message, "error");
+                if (r.message_err) {
+                    Swal.fire("Error", r.message_err, "error");
                     return false
                 } else {
-                    console.log(r)
-                    setList(r)
-                    // const res_color = r.map((e:Stats) => {
-                    //     switch (e.statusId) {
-                    //         case "published":
-                    //             e.color = "bg-lime-500"
-                    //             break;
-                    //         case "drafted":
-                    //             e.color = "bg-yellow-300"
-                    //             break;
-                    //         case "deleted":
-                    //             e.color = "bg-red-500"
-                    //             break;
-                    //         case "rejected":
-                    //             e.color = "bg-orange-400"
-                    //             break;
+                    const res_color = r.map((e:Post) => {
+                        switch (e.status) {
+                            case "published":
+                                e.color = "bg-lime-500"
+                                break;
+                            case "drafted":
+                                e.color = "bg-yellow-300"
+                                break;
+                            case "deleted":
+                                e.color = "bg-red-500"
+                                break;
+                            case "rejected":
+                                e.color = "bg-orange-400"
+                                break;
                         
-                    //         default:
-                    //             break;
-                    //     }
-                    //     return e
-                    // })
-                    // setStats(res_color)
+                            default:
+                                break;
+                        }
+                        return e
+                    })
+                    
+                    setList(res_color)
                 }
             })
             return reqData
         }
         fetchedData().then(() => setIsLoading(false))
-      }, [])
+      }, [open, isLoading])
     
     if (isLoading) {
         return <div style={{position: "absolute", top: "50%", right: "50%", opacity: "1"}}><Spinner></Spinner></div>;
@@ -128,13 +182,13 @@ export default function Component() {
                                 Visualiza todos tus post y su status!
                             </CardDescription>
                         </div>
-                        <Dialog>
+                        <Dialog open={open} onOpenChange={openModalSub}>
                             <DialogTrigger asChild>
                                 <div className="flex align-center">
                                     <Button>Agrega un Post</Button>
                                 </div>
                             </DialogTrigger>
-                            <PostForm title="Agregar" title_button="Guardar"></PostForm>
+                            <PostForm title="Agregar" title_button="Guardar" openModal={openModal}></PostForm>
                         </Dialog>
                         
                     </div>
@@ -172,24 +226,21 @@ export default function Component() {
                             list.map((l) => (
                                 <TableRow key={l._id}>
                                     <TableCell className="hidden sm:table-cell">
-                                        <Image
-                                        alt="Product image"
-                                        className="aspect-square rounded-md object-cover"
-                                        height="64"
-                                        src={l.image!}
-                                        width="64"
-                                        />
+                                        <Avatar>
+                                            <AvatarImage src={l.image!} />
+                                            <AvatarFallback>AR</AvatarFallback>
+                                        </Avatar>
                                     </TableCell>
                                     <TableCell className="font-medium">
                                         {l.message}
                                     </TableCell>
                                     <TableCell>
-                                        <Badge className="bg-lime-500" variant="outline">{l.status}</Badge>
+                                        <Badge className={l.color} variant="outline">{l.description}</Badge>
                                     </TableCell>
                                     <TableCell className="hidden md:table-cell">{l.likes?.length}</TableCell>
                                     <TableCell className="hidden md:table-cell">{l.author.username}</TableCell>
                                     <TableCell className="hidden md:table-cell">
-                                        {l.create_at.toString()}
+                                        {new Date(l.create_at).toLocaleString('en-GB')}
                                     </TableCell>
                                     <TableCell>
                                         <DropdownMenu>
@@ -200,9 +251,11 @@ export default function Component() {
                                             </Button>
                                         </DropdownMenuTrigger>
                                         <DropdownMenuContent align="end">
-                                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                                            <DropdownMenuItem>Edit</DropdownMenuItem>
-                                            <DropdownMenuItem>Delete</DropdownMenuItem>
+                                            <DropdownMenuLabel>Acciones</DropdownMenuLabel>
+                                            {role == "admin" && <DropdownMenuItem onClick={() => changeStatus("published", l._id!)}>Publicar</DropdownMenuItem>}
+                                            {role == "admin" && <DropdownMenuItem onClick={() =>  changeStatus("rejected", l._id!)}>Rechazar</DropdownMenuItem>}
+                                            <DropdownMenuItem>Editar</DropdownMenuItem>
+                                            <DropdownMenuItem onClick={() =>  changeStatus("deleted", l._id!)}>Eliminar</DropdownMenuItem>
                                         </DropdownMenuContent>
                                         </DropdownMenu>
                                     </TableCell>

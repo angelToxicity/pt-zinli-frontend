@@ -23,4 +23,6 @@ export type Post = {
     create_at: Date;
     location: string;
     status: string;
+    description?: string;
+    color?: string;
 }
