@@ -95,10 +95,18 @@ export function PostForm({title, title_button, openModal, element, img}:Props) {
             } else if (r.data.statusCode == 413) {
                 openModal("Imagen muy pesada. Intente cargar una imagen con peso no mayor a 50kb")
             } else {
-                openModal(r.data[0])
+                let res
+                if (r.data._id) {
+                    res = r.data
+                } else {
+                    res = r.data[0]
+                }
+                openModal(res)
             }
             form.reset()
-        }).catch(() => {
+        }).catch((err) => {
+            console.log(err)
+            form.reset()
             openModal("Error registrando información del post")
         })
     }
