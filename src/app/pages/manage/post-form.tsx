@@ -1,7 +1,7 @@
 import { Post } from "@/lib/definitions"
 import { useState, useEffect } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, SubmitHandler } from "react-hook-form";
+import { useForm, SubmitHandler, set } from "react-hook-form";
 import { postType, postValidation } from "../../validations/post";
 import { useSharedState } from "../../components/context";
 import {
@@ -36,27 +36,28 @@ type Props = {
 
 const crypto = new Crypto()
 
-export function PostForm({title, title_button, openModal, element}:Props) {
+export function PostForm({title, title_button, openModal, element, img}:Props) {
     const { state, setState } = useSharedState();
-    const [blob, setBlob] = useState<string|null>()
-    const [isLoading, setIsLoading] = useState(false)
+    const [blob, setBlob] = useState<string|null>("")
+    const [isLoading, setIsLoading] = useState(true)
 
     const defaultValues: Partial<postType> = {
-        image:element.image,
-        location:element.location,
-        message:element.message
+        image:"",
+        location:"",
+        message:""
     }
-
+    
     const form = useForm<postType>({
         resolver: zodResolver(postValidation),
         defaultValues
     })
 
+
     useEffect(() => {
         if (!state) {
             setState(localStorage.getItem("user")!)
         }
-
+        setIsLoading(false)
         const subscription = form.watch((value, { name, type }) => {
             if (name == "image" && type =="change") {
               const file = (document.getElementById(name) as HTMLInputElement).files![0];
@@ -68,14 +69,17 @@ export function PostForm({title, title_button, openModal, element}:Props) {
         return () => subscription.unsubscribe()
     })
 
-    
-    
     const onSubmit:SubmitHandler<postType> = (values) => {
-        values.image = blob?.toString()
+
+        if (element.edit) {
+            values._id = element._id
+        }
+
+        values.image = blob!.toString()
         values.author = state
         values.status = "drafted"
         
-        const data = {data: crypto.encryptData(JSON.stringify(values)), "method": "POST", "route": "/post/create"};
+        const data = {data: crypto.encryptData(JSON.stringify(values)), "method": "POST", "route": element.edit ? "/post/edit" : "/post/create"};
         setIsLoading(true)
         fetch("/pages/api/data",{
           method: 'POST',
@@ -91,21 +95,23 @@ export function PostForm({title, title_button, openModal, element}:Props) {
             } else if (r.data.statusCode == 413) {
                 openModal("Imagen muy pesada. Intente cargar una imagen con peso no mayor a 50kb")
             } else {
-                openModal(r.data)
+                openModal(r.data[0])
             }
+            form.reset()
         }).catch(() => {
             openModal("Error registrando información del post")
         })
     }
     
-    const toFile = (file:Blob) => {
+    const toFile = (file:File) => {
         const reader = new FileReader();
         reader.readAsDataURL(file);
         reader.onload = function () {
-          setBlob(reader.result?.toString());
-        };
+            setBlob(reader.result as string);
+            img(reader.result as string);
+        }
     }
-
+    
     if (isLoading) {
         
     }
@@ -123,21 +129,21 @@ export function PostForm({title, title_button, openModal, element}:Props) {
                             <FormField 
                             control={form.control}
                             name="image"
-                            render={() => (
+                            render={({field}) => (
                                 <FormItem>
-                                <FormLabel>Imagen</FormLabel>
-                                <FormControl>
-                                    <Input
-                                    id="image"
-                                    type="file"
-                                    accept="image/png image/jpeg, image/jpg"
-                                    // {...field}
-                                    />
-                                </FormControl>
-                                <FormDescription>*formatos aceptados (png, jpeg, jpg)</FormDescription>
-                                <FormMessage />
+                                    <FormLabel>Imagen</FormLabel>
+                                    <FormControl>
+                                        <Input
+                                        id="image"
+                                        type="file"
+                                        accept="image/png, image/jpeg, image/jpg"
+                                        {...field}
+                                        />
+                                    </FormControl>
+                                    <FormDescription>*formatos aceptados (png, jpeg, jpg)</FormDescription>
+                                    <FormMessage />
                                 </FormItem>
-                            )}
+                            )} 
                             />
                         </div>
                         <div className="grid gap-2 mt-3">

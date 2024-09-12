@@ -25,4 +25,5 @@ export type Post = {
     status: string;
     description?: string;
     color?: string;
+    edit?: boolean;
 }

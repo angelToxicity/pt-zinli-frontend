@@ -90,7 +90,7 @@ export default function Component() {
     return (
         <div className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6 items-center">
             {list.map((l) => (
-                <Card key={l._id} className="w-1/3">
+                <Card key={l._id} className="w-1/5">
                     <CardHeader>
                         <CardTitle></CardTitle>
                         <CardDescription>

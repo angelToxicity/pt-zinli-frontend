@@ -62,23 +62,20 @@ const crypto = new Crypto();
 export default function Component() {
     const [ isLoading, setIsLoading ] = useState(true)
     const [ list, setList ] = useState<Post[]>([])
-    const [ title, setTitle ] = useState("")
-    const [ title_button, setTitleButton ] = useState("")
+    const [ title, setTitle ] = useState("Agregar")
+    const [ title_button, setTitleButton ] = useState("Guardar")
     const [ open, setOpen ] = useState(false);
     const [ role, setRole ] = useState("");
     const [ element, setElement ] = useState({} as Post);
+    const [ img, setImg ] = useState("")
+    const [ mode, setMode ] = useState("+")
     const { state } = useSharedState();
-    const [img, setImg] = useState("")
 
-    const openModalSub = (estado:boolean = true) => {
-        if (estado) {
-            setTitle("Agregar")
-            setTitleButton("Guardar")
-        } else {
-            setTitle("Actualizar")
-            setTitleButton("Editar")
-        }
-        setOpen(estado)
+    const openModalSub = (event: boolean) => {
+        setTitle("Agregar")
+        setTitleButton("Guardar")
+        setElement({} as Post)
+        setOpen(event)
     }
 
     const changeStatus = async (status:string, id:string) => {
@@ -148,7 +145,7 @@ export default function Component() {
                 allowEscapeKey: false,
                 allowOutsideClick:false
             }).then((result) => {
-                if (result.isConfirmed) {
+                if (result.isConfirmed && mode == "+") {
                     const newList = [...list]
                     data.description = "Pendiente"
                     data.color = "bg-yellow-300"
@@ -159,20 +156,33 @@ export default function Component() {
                     newList.push(data)
                     setList(newList)
                 }
+                
+                if (result.isConfirmed && mode == "-") {
+                    const newList = list.map(l => {
+                        if (l._id == data._id) {
+                            data.description = "Pendiente"
+                            data.color = "bg-yellow-300"
+                            l = data
+                        }
+                        return l
+                    })
+                    setList(newList)
+                }
+                setMode("+")
             });
         }
     }
     
-    const edit = (e:Post) => {
+    const edit = (e:Post, mode:boolean) => {
+        setMode("-")
         setTitle("Editar")
         setTitleButton("Editar")
+        e.edit = mode
         setElement(e)
         setOpen(true)
     }
 
     useEffect(() => {
-        setTitle("Agregar")
-        setTitleButton("Guardar")
         let data = null
         if (state) {
             data = JSON.parse(crypto.decryptData(state))
@@ -240,10 +250,10 @@ export default function Component() {
                                 Visualiza todos tus post y su status!
                             </CardDescription>
                         </div>
-                        <Dialog open={open} onOpenChange={openModalSub}>
+                        <Dialog open={open} onOpenChange={(event) =>openModalSub(event)}>
                             <DialogTrigger asChild>
                                 <div className="flex align-center">
-                                    <Button>Agrega un Post</Button>
+                                    <Button onClick={() => setOpen(true)}>Agrega un Post</Button>
                                 </div>
                             </DialogTrigger>
                             <PostForm title={title} title_button={title_button} openModal={openModal} element={element} img={() => setImg(img)}></PostForm>
@@ -312,7 +322,7 @@ export default function Component() {
                                             <DropdownMenuLabel>Acciones</DropdownMenuLabel>
                                             {role == "admin" && <DropdownMenuItem onClick={() => changeStatus("published", l._id!)}>Publicar</DropdownMenuItem>}
                                             {role == "admin" && <DropdownMenuItem onClick={() => changeStatus("rejected", l._id!)}>Rechazar</DropdownMenuItem>}
-                                            <DropdownMenuItem onClick={() => edit(l)}>Editar</DropdownMenuItem>
+                                            <DropdownMenuItem onClick={() => edit(l, true)}>Editar</DropdownMenuItem>
                                             <DropdownMenuItem onClick={() => changeStatus("deleted", l._id!)}>Eliminar</DropdownMenuItem>
                                         </DropdownMenuContent>
                                         </DropdownMenu>

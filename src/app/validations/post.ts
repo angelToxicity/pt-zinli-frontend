@@ -7,7 +7,8 @@ export const postValidation = z.object({
 })
 
 export type postType = {
-    image:string|undefined;
+    _id?:string;
+    image:string;
     location:string;
     author:string;
     status:string;
