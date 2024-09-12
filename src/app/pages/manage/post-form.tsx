@@ -1,7 +1,7 @@
 import { Post } from "@/lib/definitions"
 import { useState, useEffect } from 'react';
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, SubmitHandler, set } from "react-hook-form";
+import { useForm, SubmitHandler } from "react-hook-form";
 import { postType, postValidation } from "../../validations/post";
 import { useSharedState } from "../../components/context";
 import {
